@@ -255,11 +255,11 @@ operator_ui/build/Release/OmegaBotOperator.exe
 
 Приложение автоматически пытается подключиться к Raspberry Pi при создании `MainWindow`.
 
-Текущий адрес задаётся в конструкторе `MainWindow`:
+В репозитории [Goslingmobile](https://github.com/LowBattery64/Goslingmobile) текущий адрес задаётся в конструкторе `MainWindow`:
 
 ```cpp
-robot.connectToRobot("10.109.150.232");
-video.connectToCameraBridge("10.109.150.232");
+robot.connectToRobot("10.25.39.101");
+video.connectToCameraBridge("10.25.39.101");
 ```
 
 Используются три TCP-соединения:
@@ -362,7 +362,7 @@ RECORD STOP
 STATUS
 ```
 
-Запись по умолчанию не запускается автоматически. Каталог записи передаётся `camera_bridge.py` из `scripts/start_robot.sh`, а фактический старт и остановка выполняются кнопкой оператора.
+Запись по умолчанию не запускается автоматически. Каталог записи передаётся `usb_camera_server` из `scripts/start_usb_camera_robot.sh`; фактический старт и остановка выполняются кнопкой оператора.
 
 # Как изменить внешний вид
 
@@ -440,8 +440,8 @@ setStyleSheet(R"(
 IP Raspberry Pi задаётся в `MainWindow.cpp`:
 
 ```cpp
-robot.connectToRobot("10.109.150.232");
-video.connectToCameraBridge("10.109.150.232");
+robot.connectToRobot("10.25.39.101");
+video.connectToCameraBridge("10.25.39.101");
 ```
 
 Если адрес Raspberry Pi изменился, изменить обе строки.
@@ -456,8 +456,8 @@ VideoConnection::connectToCameraBridge(address, port = 5001);
 Их можно изменить непосредственно при вызове:
 
 ```cpp
-robot.connectToRobot("10.109.150.232", 5000);
-video.connectToCameraBridge("10.109.150.232", 5001);
+robot.connectToRobot("10.25.39.101", 5000);
+video.connectToCameraBridge("10.25.39.101", 5001);
 ```
 
 ---
