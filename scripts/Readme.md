@@ -1,76 +1,121 @@
-# Скрипты запуска Робота
+# Скрипты запуска Goslingmobile
 
-Папка содержит скрипты для автоматизированного запуска и остановки текущей системы.
+Скрипты запускают сервер управления и видеосервер на Raspberry Pi. В текущем репозитории основной вариант — USB-камера и скрипты `start_usb_camera_robot.sh` / `stop_usb_camera_robot.sh`.
 
-## Состав
+> **Важно о каталоге.** Текущие скрипты используют рабочий каталог `$HOME/labirinth_robot`. Поэтому клонируй новый репозиторий Goslingmobile именно в эту локальную папку, пока путь в скриптах не изменён.
 
-### start_robot.sh
+## 1. Получить репозиторий на Raspberry Pi
 
-Запускается на Raspberry Pi.
+Если репозиторий ещё не склонирован:
 
-Выполняет:
-1. проверяет репозиторий;
-2. проверяет Arduino в /dev/ttyUSB0;
-3. компилирует labirinth_server.cpp;
-4. запускает labirinth_server;
-5. запускает camera_bridge.py;
-6. включает запись видео на USB-накопитель.
+```bash
+git clone https://github.com/LowBattery64/Goslingmobile.git ~/labirinth_robot
+cd ~/labirinth_robot
+```
 
-Процессы запускаются в фоне.
+Если папка уже существует, перейди в неё и обнови файлы:
 
-Логи:
-    ~/labirinth_robot/server_console.log
-    ~/labirinth_robot/camera_console.log
+```bash
+cd ~/labirinth_robot
+git remote -v
+git pull
+```
 
-PID-файлы:
-    ~/labirinth_robot/.labirinth_server.pid
-    ~/labirinth_robot/.camera_bridge.pid
+Убедись, что `origin` указывает на `https://github.com/LowBattery64/Goslingmobile.git`. Если ранее был настроен старый репозиторий, замени URL:
 
-Запись по умолчанию:
-    /media/raspberry/76E8-CACF/omegabot_recordings
+```bash
+git remote set-url origin https://github.com/LowBattery64/Goslingmobile.git
+git pull
+```
 
-Без записи:
-    RECORD_VIDEO=0 bash scripts/start_robot.sh
+## 2. Установить зависимости
 
-Параметры можно переопределить через CAMERA_IP, CAMERA_PORT, VIDEO_PORT, SERIAL_DEVICE и RECORD_DIR.
+```bash
+sudo apt update
+sudo apt install -y g++ pkg-config libopencv-dev
+```
 
-### stop_robot.sh
+Проверь подключение Arduino и USB-камеры:
 
-Останавливает camera_bridge.py и labirinth_server на Raspberry Pi.
+```bash
+ls /dev/ttyUSB*
+ls /dev/video*
+```
 
-    bash scripts/stop_robot.sh
+По умолчанию используются Arduino `/dev/ttyUSB0` и камера `/dev/video0`.
 
+## 3. Запустить систему с USB-камерой
 
-# Первый запуск
+```bash
+chmod +x scripts/start_usb_camera_robot.sh scripts/stop_usb_camera_robot.sh
+./scripts/start_usb_camera_robot.sh
+```
 
-## SSH
+Скрипт проверяет наличие каталога репозитория, Arduino и камеры, компилирует `labirinth_server.cpp` и `usb_camera_server.cpp`, затем запускает оба сервера в фоне.
 
-Должна работать команда:
+### Параметры
 
-    ssh raspberry@10.109.150.232
+| Переменная | Значение по умолчанию | Назначение |
+|---|---|---|
+| `SERIAL_DEVICE` | `/dev/ttyUSB0` | Последовательный порт Arduino |
+| `USB_CAMERA_INDEX` | `0` | Индекс камеры: `0` означает `/dev/video0` |
+| `VIDEO_PORT` | `5001` | TCP-порт видеопотока |
+| `VIDEO_CONTROL_PORT` | `5002` | TCP-порт управления качеством и записью |
+| `RECORD_DIR` | `/media/raspberry/76E8-CACF/omegabot_recordings` | Каталог видеозаписей |
+| `RECORD_SEGMENT_SECONDS` | `600` | Длительность сегмента записи в секундах |
 
-Для автоматического запуска нужен SSH-ключ без запроса пароля.
+Пример запуска со второй камерой:
 
-Проверка:
-    ssh -o BatchMode=yes raspberry@10.109.150.232 "echo SSH_OK"
+```bash
+USB_CAMERA_INDEX=1 ./scripts/start_usb_camera_robot.sh
+```
 
+Каталог записи создаётся автоматически, но скрипт не проверяет, смонтирован ли USB-накопитель в этот путь.
 
-## Raspberry Pi
+## 4. Остановить серверы
 
-Нужны:
-- g++;
-- Python 3;
-- Python OpenCV;
-- подключённая Arduino;
-- смонтированный USB-накопитель для записи.
+```bash
+./scripts/stop_usb_camera_robot.sh
+```
 
+## 5. Логи и проверка портов
 
-# Ограничения
+Файлы создаются в корне локального каталога репозитория:
 
-- IP Raspberry Pi и камеры прописаны в скриптах;
-- путь USB-накопителя прописан в start_robot.sh;
-- нужен SSH-ключ;
-- Arduino должна быть уже прошита;
-- камера пока требует открытия веб-страницы для активации публикации видеопотока;
-- скрипты не прошивают Arduino;
-- Operator UI пересобирается только при отсутствии .exe или с параметром -Build.
+| Файл | Назначение |
+|---|---|
+| `server_console.log` | Вывод сервера управления |
+| `usb_camera_console.log` | Вывод видеосервера |
+| `.labirinth_server.pid` | PID сервера управления |
+| `.usb_camera_server.pid` | PID видеосервера |
+
+Команды диагностики:
+
+```bash
+tail -n 50 ~/labirinth_robot/server_console.log
+tail -n 50 ~/labirinth_robot/usb_camera_console.log
+ps aux | grep -E 'labirinth_server|usb_camera_server'
+ss -lntp | grep -E ':5000|:5001|:5002'
+```
+
+## Сеть
+
+| Назначение | Порт |
+|---|---:|
+| Управление и телеметрия | TCP `5000` |
+| Видеопоток | TCP `5001` |
+| Управление качеством и записью | TCP `5002` |
+
+IP Raspberry Pi зависит от текущей сети. Адрес, который выводится скриптом, является параметром конкретной конфигурации, а не универсальным адресом. Если IP изменился, проверь настройки в `operator_ui/MainWindow.cpp`.
+
+## Старый запуск через сетевую камеру
+
+`start_robot.sh` и `stop_robot.sh` относятся к прежней конфигурации с `camera_bridge.py` и внешним источником видеопотока. Файл `camera_bridge.py` не находится в корне текущего репозитория; архивная копия лежит в `archive/`. Этот сценарий не является рекомендуемым запуском. Для актуальной USB-камеры используй `start_usb_camera_robot.sh`.
+
+## Ограничения
+
+- Скрипты не прошивают Arduino: прошивку `str02-controller.ino` нужно загрузить отдельно.
+- Перед запуском Arduino должна быть подключена к Raspberry Pi и доступна через указанный Serial-порт.
+- Камера должна определяться как `/dev/videoN`.
+- Для записи на внешний накопитель он должен быть смонтирован в `RECORD_DIR`.
+- После клонирования не переименовывай локальный каталог без изменения `REPO_DIR` в скриптах: сейчас там явно указан `$HOME/labirinth_robot`.
