@@ -51,17 +51,17 @@
 ssh raspberry@10.25.39.101
 ```
 
-При первом запуске склонируйте новый репозиторий в каталог `~/labirinth_robot`. Это имя локальной папки пока необходимо текущим скриптам запуска:
+При первом запуске склонируйте актуальный репозиторий Goslingmobile в каталог `~/Goslingmobile`:
 
 ```bash
-git clone https://github.com/LowBattery64/Goslingmobile.git ~/labirinth_robot
-cd ~/labirinth_robot
+git clone https://github.com/LowBattery64/Goslingmobile.git ~/Goslingmobile
+cd ~/Goslingmobile
 ```
 
 При последующих обновлениях:
 
 ```bash
-cd ~/labirinth_robot
+cd ~/Goslingmobile
 git remote set-url origin https://github.com/LowBattery64/Goslingmobile.git
 git pull
 ```

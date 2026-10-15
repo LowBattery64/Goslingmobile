@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="$HOME/labirinth_robot"
+REPO_DIR="$HOME/Goslingmobile"
 
 SERVER_SOURCE="$REPO_DIR/labirinth_server.cpp"
 SERVER_BINARY="$REPO_DIR/labirinth_server"

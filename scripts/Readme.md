@@ -2,21 +2,21 @@
 
 Скрипты запускают сервер управления и видеосервер на Raspberry Pi. В текущем репозитории основной вариант — USB-камера и скрипты `start_usb_camera_robot.sh` / `stop_usb_camera_robot.sh`.
 
-> **Важно о каталоге.** Текущие скрипты используют рабочий каталог `$HOME/labirinth_robot`. Поэтому клонируй новый репозиторий Goslingmobile именно в эту локальную папку, пока путь в скриптах не изменён.
+> **Важно о каталоге.** Скрипты используют рабочий каталог `$HOME/Goslingmobile`, соответствующий имени актуального репозитория.
 
 ## 1. Получить репозиторий на Raspberry Pi
 
 Если репозиторий ещё не склонирован:
 
 ```bash
-git clone https://github.com/LowBattery64/Goslingmobile.git ~/labirinth_robot
-cd ~/labirinth_robot
+git clone https://github.com/LowBattery64/Goslingmobile.git ~/Goslingmobile
+cd ~/Goslingmobile
 ```
 
 Если папка уже существует, перейди в неё и обнови файлы:
 
 ```bash
-cd ~/labirinth_robot
+cd ~/Goslingmobile
 git remote -v
 git pull
 ```
@@ -92,8 +92,8 @@ USB_CAMERA_INDEX=1 ./scripts/start_usb_camera_robot.sh
 Команды диагностики:
 
 ```bash
-tail -n 50 ~/labirinth_robot/server_console.log
-tail -n 50 ~/labirinth_robot/usb_camera_console.log
+tail -n 50 ~/Goslingmobile/server_console.log
+tail -n 50 ~/Goslingmobile/usb_camera_console.log
 ps aux | grep -E 'labirinth_server|usb_camera_server'
 ss -lntp | grep -E ':5000|:5001|:5002'
 ```
@@ -118,4 +118,4 @@ IP Raspberry Pi зависит от текущей сети. Адрес, кот�
 - Перед запуском Arduino должна быть подключена к Raspberry Pi и доступна через указанный Serial-порт.
 - Камера должна определяться как `/dev/videoN`.
 - Для записи на внешний накопитель он должен быть смонтирован в `RECORD_DIR`.
-- После клонирования не переименовывай локальный каталог без изменения `REPO_DIR` в скриптах: сейчас там явно указан `$HOME/labirinth_robot`.
+- Скрипты ожидают актуальный локальный каталог `$HOME/Goslingmobile`.
