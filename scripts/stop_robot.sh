@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-REPO_DIR="$HOME/labirinth_robot"
+REPO_DIR="$HOME/Goslingmobile"
 SERVER_PID_FILE="$REPO_DIR/.labirinth_server.pid"
 CAMERA_PID_FILE="$REPO_DIR/.camera_bridge.pid"
 
