@@ -45,11 +45,24 @@
 
 ### 2. Запустить серверы на Raspberry Pi
 
-Подключитесь к Raspberry Pi:
+Сначала подключитесь к Raspberry Pi:
 
 ```bash
 ssh raspberry@10.25.39.101
+```
+
+При первом запуске склонируйте новый репозиторий в каталог `~/labirinth_robot`. Это имя локальной папки пока необходимо текущим скриптам запуска:
+
+```bash
+git clone https://github.com/LowBattery64/Goslingmobile.git ~/labirinth_robot
 cd ~/labirinth_robot
+```
+
+При последующих обновлениях:
+
+```bash
+cd ~/labirinth_robot
+git remote set-url origin https://github.com/LowBattery64/Goslingmobile.git
 git pull
 ```
 
@@ -57,7 +70,7 @@ git pull
 
 ```bash
 sudo apt update
-sudo apt install -y libopencv-dev pkg-config
+sudo apt install -y g++ pkg-config libopencv-dev
 ```
 
 Проверьте подключение платы и камеры:
